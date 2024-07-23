@@ -6,14 +6,11 @@ repos:
         name: isort (python)
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    # Ruff version.
     rev: v0.5.4
     hooks:
-      # Run the linter.
       - id: ruff
         types_or: [ python, pyi, jupyter ]
         args: [ --fix ]
-      # Run the formatter.
       - id: ruff-format
         types_or: [ python, pyi, jupyter ]
 
@@ -21,6 +18,7 @@ repos:
     rev: 7.0.0
     hooks:
       - id: flake8
+        args: ["--ignore=Q000,C101"]
         additional_dependencies:
           - flake8-bugbear
           - flake8-builtins
@@ -28,3 +26,8 @@ repos:
           - flake8-import-order
           - flake8-polyfill
           - flake8-quotes
+
+  - repo: https://github.com/hhatto/autopep8
+    rev: v2.3.1
+    hooks:
+    -   id: autopep8

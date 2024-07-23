@@ -1,10 +1,7 @@
 from flask import Flask
 
 from flask_task.api.models import db
-from flask_task.utils.environment import (
-    DATABASE_URI,
-    TEMPLATES_AUTO_RELOAD
-)
+from flask_task.utils.environment import DATABASE_URI, TEMPLATES_AUTO_RELOAD
 
 
 def create_app():
