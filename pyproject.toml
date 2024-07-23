@@ -12,8 +12,13 @@ Flask = "^3.0.3"
 SQLAlchemy = "^2.0.31"
 Flask-SQLAlchemy = "^3.1.1"
 Jinja2 = "^3.1.4"
+uv = "^0.2.27"
 
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+# Set the maximum line length to 79.
+line-length = 79
