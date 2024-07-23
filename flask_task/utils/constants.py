@@ -1,0 +1,6 @@
+RESPONSE_STATUS = "status"
+RESPONSE_MSG = "msg"
+API_RESPONSE_OBJ = {
+    RESPONSE_STATUS: False,
+    RESPONSE_MSG: "TODO",
+}

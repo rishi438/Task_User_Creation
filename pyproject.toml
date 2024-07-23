@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "flask_task"
+version = "0.1.0"
+description = "YE Stack Task"
+authors = ["xenn <rishi734438@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+Flask = "^3.0.3"
+SQLAlchemy = "^2.0.31"
+Flask-SQLAlchemy = "^3.1.1"
+Jinja2 = "^3.1.4"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
