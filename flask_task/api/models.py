@@ -19,7 +19,7 @@ class User(db.Model):
     _id = db.Column(
         db.String(36), primary_key=True, default=lambda: str(uuid4())
     )
-    name = db.Column(db.String(36), unique=True, nullable=False)
+    username = db.Column(db.String(36), unique=True, nullable=False)
     mobile_number = db.Column(db.String(36), nullable=True)
     role = db.Column(db.Enum(UserType), default=1)
     password_hash = db.Column(db.String(128), nullable=False)

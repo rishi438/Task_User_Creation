@@ -17,14 +17,16 @@ def add_user():
     response["msg"] = "Error Occured!"
     try:
         data = request.get_json() or {}
-        password = data.pop("password")
-        user = User(**data)
-        user.set_password(password)
-        if user:
-            db.session.add(user)
-            db.session.commit()
-            response["msg"] = "Added Successfully"
-            response["status"] = True
+        if data:
+            data["username"] = data["username"].lower()
+            password = data.pop("password")
+            user = User(**data)
+            user.set_password(password)
+            if user:
+                db.session.add(user)
+                db.session.commit()
+                response["msg"] = "Added Successfully"
+                response["status"] = True
     except Exception as ex:
         print(f"Error Occurred route_handler.add_user: {ex}")
     return jsonify(response)
@@ -41,13 +43,13 @@ def user_login():
     response["msg"] = "Error Occured!"
     try:
         data = request.get_json() or {}
-        if "name" not in data or "password" not in data:
+        if "username" not in data or "password" not in data:
             response["msg"] = "Missing username or password"
             return jsonify(response)
         user = User()
-        name = data["name"]
+        username = data["username"].lower()
         password = data["password"]
-        user = User.query.filter_by(name=name).first()
+        user = User.query.filter_by(username=username).first()
         if user is None:
             response["msg"] = "User does not exist"
             return jsonify(response)

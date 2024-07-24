@@ -1,0 +1,88 @@
+{% extends "layouts/base.html" %} {% block header%} {%endblock%} {% block
+container%}
+<div class="container h-100">
+    <div class="row gy-5 h-100">
+        <div class="d-flex justify-content-center align-self-center">
+            <div class="card px-5 py-5">
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="username" placeholder="Username">
+                        </div>
+                        <div class="col-12">
+                            <label for="inputAddress2" class="form-label">Address 2</label>
+                            <input type="Password" class="form-control" id="password" placeholder="Password">
+                        </div>
+                    <div>
+                    <div class="col-12">
+                        <button type="submit" id="login_btn" class="btn btn-primary">Log in</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    "use strict";
+    $(function () {
+        var UserAuthenticate = {
+            init: function () {
+                var that = this;
+                this.base_url = window.location.origin;
+                that.on_load();
+            },
+            on_load: function(){
+                let login_btn = document.getElementById("login_btn")
+                login_btn.addEventListener("click",()=>{
+                    console.log("logging in")
+                    let payload = {};
+                    payload["username"] = document.getElementById("username").value
+                    payload["password"] = document.getElementById("password").value
+                    if(payload){
+                        this.login_fun(payload)
+                    }
+                });
+            },
+            redirect_to_url: function(url, delay = 300) {
+                if (!url) return;
+                setTimeout(() => {
+                    window.location.href = url;
+                }, delay);
+            },
+            login_fun : function(payload){
+                let that = this;
+                console.log(payload);
+                $.ajax({
+                    type:'POST',
+                    dataType: "json",
+                    url:'/api/login',
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify(payload),
+                    complete: function () {
+                    },
+                    success:function(data) {
+                        console.log(data);
+                        if (data){
+                            if (data.status){
+                                console.log("logged In");
+                                that.redirect_to_url(that.base_url+"/dashboard"+`?username=${payload.username}`, 1000);
+                            }else{
+                                console.log(data.msg);
+                            }
+                        }
+                    }
+                }
+                )
+
+            },
+        };
+        $(document).ready(function () {
+            UserAuthenticate.init();
+        });
+    })
+
+</script>
+
+{%endblock%}
