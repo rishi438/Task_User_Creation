@@ -1,4 +1,8 @@
-from flask import Blueprint, jsonify, request
+from datetime import datetime, timedelta
+
+from flask import Blueprint, jsonify, make_response, request
+from flask_jwt_extended import create_access_token  # get_jwt_identity,
+from flask_jwt_extended import jwt_required
 
 from flask_task.api.models import User, db
 from flask_task.utils.constants import API_RESPONSE_OBJ
@@ -55,10 +59,39 @@ def user_login():
             return jsonify(response)
         pass_check = user.check_password(password)
         if pass_check:
-            response["msg"] = "Logged In Successfully"
+            access_token = access_token = create_access_token(
+                identity="user_id", expires_delta=timedelta(hours=1)
+            )
+            expires = datetime.now() + timedelta(hours=1)
             response["status"] = True
+            response["msg"] = "Logged In Successfully"
+            resp = make_response(jsonify(response))
+            resp.set_cookie(
+                "access_token", access_token, httponly=True, expires=expires
+            )
+            return resp
         else:
             response["msg"] = "Invalid password"
     except Exception as ex:
         print(f"Error Occurred route_handler.user_login: {ex}")
-    return jsonify(response)
+    return make_response(jsonify(response))
+
+
+@api_routes.route("/users", methods=["GET"])
+@jwt_required()
+def user_data():
+    try:
+        # user_id = get_jwt_identity()
+        response = API_RESPONSE_OBJ.copy()
+        response["msg"] = "Error Occured!"
+        users = User.query.all()
+        user_list = []
+        for user in users:
+            user_list.append({"username": user.username, "role": user.role})
+        response["status"] = True
+        response["msg"] = "Users retrieved successfully"
+        response["data"] = {}
+        response["data"]["users"] = user_list
+    except Exception as ex:
+        print(f"Error Occured user_data: {ex}")
+    return make_response(jsonify(response))

@@ -2,3 +2,11 @@
     container%}
     <h1>Yes! {{username}}</h1>
 {%endblock%}
+
+<script>
+    $.ajaxSetup({
+        xhrFields: {
+            withCredentials: true,
+        }
+    });
+</script>

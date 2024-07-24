@@ -3,7 +3,7 @@ from flask import make_response, render_template, request
 from flask_task.api.route_handler import api_routes
 from flask_task.app_build import create_app
 
-app = create_app()
+app, jwt = create_app()
 
 
 with app.app_context():
