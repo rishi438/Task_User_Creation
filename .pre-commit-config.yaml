@@ -1,4 +1,9 @@
 repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
   - repo: https://github.com/pycqa/isort
     rev: 5.12.0
     hooks:
@@ -30,9 +35,3 @@ repos:
           - flake8-coding
           - flake8-polyfill
           - flake8-quotes
-
-  - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.6.0
-    hooks:
-      - id: end-of-file-fixer
-      - id: trailing-whitespace
