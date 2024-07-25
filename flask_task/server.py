@@ -30,7 +30,7 @@ def test():
     return make_response(render_template("/layouts/index.html", **data), 200)
 
 
-@app.route("/login", methods=["GET"])
+@app.route("/", methods=["GET"])
 def login():
     """_summary_
 
