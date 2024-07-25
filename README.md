@@ -15,7 +15,6 @@ This project is a task management application built using Flask, SQLAlchemy, and
 
     ```sh
     git clone https://github.com/your-repo/flask-task-app.git
-    cd flask-task-app
     ```
 
 2. **Install Poetry:**
