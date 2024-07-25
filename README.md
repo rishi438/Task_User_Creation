@@ -50,13 +50,13 @@ This project is a task management application built using Flask, SQLAlchemy, and
 1. **Activate the virtual environment:**
 
     ```sh
-    poetry shell
+    conda create -n test
     ```
 
 2. **Run the Flask application:**
 
     ```sh
-    flask run
+    poetry run python -m flask_task.server
     ```
 
     The application will be available at `http://127.0.0.1:5000`.
@@ -68,7 +68,7 @@ This project is a task management application built using Flask, SQLAlchemy, and
     Add a new user.
 
     ```sh
-    curl -X POST http://127.0.0.1:5000/add-user -H "Content-Type: application/json" -d '{
+    curl -X POST http://127.0.0.1:5000/api/add-user -H "Content-Type: application/json" -d '{
         "username": "example",
         "password": "examplepassword",
         "role": "User",
@@ -81,7 +81,7 @@ This project is a task management application built using Flask, SQLAlchemy, and
     Log in a user.
 
     ```sh
-    curl -X POST http://127.0.0.1:5000/login -H "Content-Type: application/json" -d '{
+    curl -X POST http://127.0.0.1:5000/api/login -H "Content-Type: application/json" -d '{
         "username": "example",
         "password": "examplepassword"
     }'
@@ -92,7 +92,7 @@ This project is a task management application built using Flask, SQLAlchemy, and
     Get a list of all users.
 
     ```sh
-    curl -X GET http://127.0.0.1:5000/users -H "Content-Type: application/json"
+    curl -X GET http://127.0.0.1:5000/api/users -H "Content-Type: application/json"
     ```
 
 - **POST /add-task**
@@ -100,7 +100,7 @@ This project is a task management application built using Flask, SQLAlchemy, and
     Add a new task (requires JWT token).
 
     ```sh
-    curl -X POST http://127.0.0.1:5000/add-task -H "Content-Type: application/json" -H "Authorization: Bearer <your_jwt_token>" -d '{
+    curl -X POST http://127.0.0.1:5000/api/add-task -H "Content-Type: application/json" -H "Authorization: Bearer <your_jwt_token>" -d '{
         "created_for": "user2",
         "task_data": {
             "title": "New Task",
