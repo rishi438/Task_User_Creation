@@ -23,10 +23,12 @@ def create_app():
     app.config["TEMPLATES_AUTO_RELOAD"] = TEMPLATES_AUTO_RELOAD
     app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URI
     app.config["JWT_SECRET_KEY"] = JWT_SECRET_KEY
-    app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
+    app.config["JWT_COOKIE_SECURE"] = False
+    app.config["JWT_COOKIE_CSRF_PROTECT"] = False
+    app.config["JWT_TOKEN_LOCATION"] = ["cookies"]
+    app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=2)
     jwt = JWTManager(app)
     db.init_app(app)
-
     with app.app_context():
         db.create_all()
 

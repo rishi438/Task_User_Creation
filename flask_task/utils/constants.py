@@ -19,3 +19,16 @@ class UserType(IntEnum):
     ADMIN = 0
     GUEST = 1
     CUSTOMER = 2
+
+
+@unique
+class TaskType(IntEnum):
+    """_summary_
+
+    Args:
+        IntEnum (_type_): _description_
+    """
+
+    INITIATED = 0
+    REVIEW = 1
+    PUBLISHED = 2

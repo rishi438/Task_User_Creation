@@ -1,12 +1,154 @@
-{% extends "layouts/base.html" %} {% block header%} {%endblock%} {% block
+{% extends "layouts/base.html" %} {% block header%}
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.15.2/css/selectize.default.min.css"
+  integrity="sha512-pTaEn+6gF1IeWv3W1+7X7eM60TFu/agjgoHmYhAfLEU8Phuf6JKiiE8YmsNC0aCgQv4192s4Vai8YZ6VNM6vyQ=="
+  crossorigin="anonymous"
+  referrerpolicy="no-referrer"
+/>
+<link href="
+https://cdn.jsdelivr.net/npm/toastr@2.1.4/build/toastr.min.css
+" rel="stylesheet">
+<script src="
+https://cdn.jsdelivr.net/npm/toastr@2.1.4/toastr.min.js
+"></script>
+<script
+  src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.15.2/js/selectize.min.js"
+  integrity="sha512-IOebNkvA/HZjMM7MxL0NYeLYEalloZ8ckak+NDtOViP7oiYzG5vn6WVXyrJDiJPhl4yRdmNAG49iuLmhkUdVsQ=="
+  crossorigin="anonymous"
+  referrerpolicy="no-referrer"
+></script>
+<style>
+    .card{
+        width: -webkit-fill-available;
+    }
+</style>
+{%endblock%} {% block
     container%}
-    <h1>Yes! {{username}}</h1>
-{%endblock%}
+    <div class="container h-100">
+        <div class="row gy-5 h-100">
+            <div class="d-flex justify-content-center align-self-center">
+                <div class="card px-5 py-5">
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <label for="username" class="form-label">Username</label>
+                                <select id="select_user" placeholder="Select a user"></select>
+                            </div>
+                            <div class="col-6">
+                                <label for="task" class="form-label">Task</label>
+                                <select id="select_status" placeholder="Change the task status"></select>
+                            </div>
+                        </div>
+                        <div class="col-12 mt-5 d-flex justify-content-end">
+                            <button type="submit" id="submit_btn" class="btn btn-primary">Submit</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        $.ajaxSetup({
+            xhrFields: {
+                withCredentials: true,
+            }
+        });
+        $(function () {
+            var dashboard = {
+                init: function () {
+                    var that = this;
+                    this.base_url = window.location.origin;
+                    that.on_load();
+                },
+                on_load: function(){
+                    let options = [{"status":"initiated"}, {"status":"review"}, {"status":"published"}]
+                    this.dropdown_func("select_status", options, "status", ["status"]);
+                    this.users_data();
+                    let submit_btn = document.getElementById("submit_btn");
+                    submit_btn.addEventListener("click",()=>{
+                        console.log("logging in");
+                        let payload = {};
+                        payload = {
+                            "created_for" : document.getElementById("select_user").value,
+                            "task_data":{
+                                "status" : document.getElementById("select_status").value
+                            }
+                        }
+                        if(payload){
+                            this.pub_task(payload);
+                        }
+                    });
+                },
+                /* redirect_to_url: function(url, delay = 300) {
+                    if (!url) return;
+                    setTimeout(() => {
+                        window.location.href = url;
+                    }, delay);
+                }, */
+                users_data : function(){
+                    let that = this;
+                    $.ajax({
+                        type:'GET',
+                        dataType: 'json',
+                        url:'/api/users',
+                        contentType: "application/json; charset=utf-8",
+                        complete: function () {
 
-<script>
-    $.ajaxSetup({
-        xhrFields: {
-            withCredentials: true,
-        }
-    });
-</script>
+                        },
+                        success:function(response) {
+                            if (response){
+                                if (response.status){
+                                    let options = response.data.users
+                                    value = "username";
+                                    label = ["username"]
+                                    that.dropdown_func("select_user", options, value, label)
+                                }else{
+                                    console.log(response.msg);
+                                }
+                            }
+                        }
+                    })
+                },
+
+                pub_task : function(payload){
+                    let that = this;
+                    $.ajax({
+                        type:'POST',
+                        dataType: 'json',
+                        url:'/api/add-task',
+                        contentType: "application/json; charset=utf-8",
+                        data: JSON.stringify(payload),
+                        complete: function () {
+
+                        },
+                        success:function(response) {
+                            if (response){
+                                if (response.status){
+                                    console.log("published")
+                                    toastr.success("Task published successfully", "Success");
+                                }else{
+                                    console.log(response.msg);
+                                    toastr.error(response.msg, "Error");
+                                }
+                            }
+                        }
+                    })
+                },
+                dropdown_func : function(ele, options, value, label){
+                    var $select = $("#"+ele).selectize({
+                        maxItems: 1,
+                        valueField: value,
+                        labelField: label,
+                        searchField: value,
+                        options: options,
+                        create: false
+                    });
+                }
+            };
+            $(document).ready(function () {
+                dashboard.init();
+            });
+        })
+    </script>
+{%endblock%}

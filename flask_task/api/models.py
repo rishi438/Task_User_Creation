@@ -4,7 +4,7 @@ from uuid import uuid4
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from flask_task.utils.constants import UserType
+from flask_task.utils.constants import TaskType, UserType
 
 db = SQLAlchemy()
 
@@ -16,7 +16,7 @@ class User(db.Model):
         db.Model (object): The base class for User model.
     """
 
-    _id = db.Column(
+    user_id = db.Column(
         db.String(36), primary_key=True, default=lambda: str(uuid4())
     )
     username = db.Column(db.String(36), unique=True, nullable=False)
@@ -49,3 +49,33 @@ class User(db.Model):
             _type_: _description_
         """
         return check_password_hash(self.password_hash, password)
+
+
+class Task(db.Model):
+    """_summary_
+
+    Args:
+        db (_type_): _description_
+    """
+
+    task_id = db.Column(
+        db.String(36),
+        primary_key=True,
+        unique=True,
+        default=lambda: str(uuid4()),
+        nullable=False,
+    )
+    status = db.Column(db.Enum(TaskType), default=0)
+    created_user = db.Column(
+        db.String(36), db.ForeignKey("user.user_id"), nullable=False
+    )
+    created_for = db.Column(
+        db.String(36), db.ForeignKey("user.user_id"), nullable=False
+    )
+    last_modified = db.Column(
+        db.DateTime,
+        default=datetime.now,
+        onupdate=datetime.now,
+        nullable=False,
+    )
+    created_date = db.Column(db.DateTime, default=datetime.now, nullable=False)

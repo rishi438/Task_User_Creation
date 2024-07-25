@@ -2,9 +2,18 @@ from flask import make_response, render_template, request
 
 from flask_task.api.route_handler import api_routes
 from flask_task.app_build import create_app
+from flask_cors import CORS
 
 app, jwt = create_app()
-
+cors = CORS(
+    app,
+    resources={
+        r"/api/*": {
+            "origins": "http://localhost:5000",
+            "supports_credentials": True,
+        }
+    },
+)
 
 with app.app_context():
     app.register_blueprint(api_routes, url_prefix="/api")
@@ -41,6 +50,7 @@ def dashboard():
     """
     data = {}
     data["username"] = request.args.get("username")
+
     return make_response(render_template("/pages/dashboard.html", **data), 200)
 
 
