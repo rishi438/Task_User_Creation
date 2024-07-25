@@ -16,7 +16,10 @@ This project is a task management application built using Flask, SQLAlchemy, and
     ```sh
     git clone https://github.com/your-repo/flask-task-app.git
     ```
-
+2. **Create Virtual Env with Conda:**
+    ```
+    conda create -n test
+    ```
 2. **Install Poetry:**
 
     Poetry is a dependency management tool for Python. You can install it using the official installer.
@@ -50,7 +53,7 @@ This project is a task management application built using Flask, SQLAlchemy, and
 1. **Activate the virtual environment:**
 
     ```sh
-    conda create -n test
+    conda activate test
     ```
 
 2. **Run the Flask application:**
