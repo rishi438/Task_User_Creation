@@ -1,87 +1,218 @@
 {% extends "layouts/base.html" %} {% block header%} {%endblock%} {% block
 container%}
 <div class="container h-100">
-    <div class="row gy-5 h-100">
-        <div class="d-flex justify-content-center align-self-center">
-            <div class="card px-5 py-5">
-                <div class="card-body">
-                    <div class="row g-3">
-                        <div class="col-12">
-                            <label for="username" class="form-label">Username</label>
-                            <input type="text" class="form-control" id="username" placeholder="Username">
-                        </div>
-                        <div class="col-12">
-                            <label for="inputAddress2" class="form-label">Address 2</label>
-                            <input type="Password" class="form-control" id="password" placeholder="Password">
-                        </div>
-                    <div>
-                    <div class="col-12">
-                        <button type="submit" id="login_btn" class="btn btn-primary">Log in</button>
-                    </div>
-                </div>
+  <div class="row gy-5 h-100">
+    <div class="d-flex justify-content-center align-self-center">
+      <div class="login-details card px-5 py-5" id="login_form">
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-12">
+              <label for="username" class="form-label">Username</label>
+              <input
+                type="text"
+                class="form-control"
+                id="username"
+                placeholder="Username"
+              />
             </div>
+            <div class="col-12">
+              <label for="Password" class="form-label">Password</label>
+              <input
+                type="Password"
+                class="form-control"
+                id="password"
+                placeholder="Password"
+              />
+            </div>
+            <div>
+              <div class="col-12">
+                <button type="submit" id="login_btn" class="btn btn-primary">
+                  Log in
+                </button>
+              </div>
+              <div class="col-12">
+                <button id="show_signup" class="btn btn-link px-0">
+                  Sign up
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
+      <div class="sign-up card px-5 py-5 d-none" id="signup_form">
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-12">
+              <label for="signup-username">Username</label>
+              <input
+                type="text"
+                class="form-control"
+                id="signup_username"
+                placeholder="Username"
+              />
+            </div>
+            <div class="col-12">
+              <label for="signup-password">Password</label>
+              <input
+                type="password"
+                class="form-control"
+                id="signup_password"
+                placeholder="Password"
+              />
+            </div>
+            <div class="col-12">
+              <label for="signup-role">Role</label>
+              <select id="signup_role" class="form-control">
+                <option selected value="CUSTOMER">Customer</option>
+                <option value="ADMIN">Admin</option>
+                <option value="GUEST">User</option>
+              </select>
+            </div>
+            <div class="col-12">
+              <label for="signup-mobilenumber">Mobile Number</label>
+              <input
+                type="text"
+                class="form-control"
+                id="signup_mobilenumber"
+                placeholder="Mobile Number"
+              />
+            </div>
+            <button type="submit" id="signup_btn" class="btn my-3 btn-primary">
+              Sign up
+            </button>
+            <div class="col-12">
+              <button id="show_login" class="btn btn-link px-0">Log in</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-</div>
+  </div>
 
-<script>
+  <script>
     "use strict";
     $(function () {
-        var UserAuthenticate = {
-            init: function () {
-                var that = this;
-                this.base_url = window.location.origin;
-                that.on_load();
-            },
-            on_load: function(){
-                let login_btn = document.getElementById("login_btn")
-                login_btn.addEventListener("click",()=>{
-                    console.log("logging in")
-                    let payload = {};
-                    payload["username"] = document.getElementById("username").value
-                    payload["password"] = document.getElementById("password").value
-                    if(payload){
-                        this.login_fun(payload)
-                    }
-                });
-            },
-            redirect_to_url: function(url, delay = 300) {
-                if (!url) return;
-                setTimeout(() => {
-                    window.location.href = url;
-                }, delay);
-            },
-            login_fun : function(payload){
-                let that = this;
-                $.ajax({
-                    type:'POST',
-                    dataType: "json",
-                    url:'/api/login',
-                    contentType: "application/json; charset=utf-8",
-                    data: JSON.stringify(payload),
-                    complete: function () {
-                    },
-                    success:function(data) {
-                        console.log(data);
-                        if (data){
-                            if (data.status){
-                                console.log("logged In");
-                                that.redirect_to_url(that.base_url+"/dashboard"+`?username=${payload.username}`, 1000);
-                            }else{
-                                console.log(data.msg);
-                            }
-                        }
-                    }
+      var UserAuthenticate = {
+        init: function () {
+          var that = this;
+          this.base_url = window.location.origin;
+          that.on_load();
+        },
+        on_load: function () {
+          this.btn_switch();
+          let login_btn = document.getElementById("login_btn");
+          let signup_btn = document.getElementById("signup_btn");
+          login_btn.addEventListener("click", (event) => {
+            event.preventDefault();
+            console.log("logging in");
+            let payload = {};
+            payload["username"] = document.getElementById("username").value;
+            payload["password"] = document.getElementById("password").value;
+            if (payload) {
+              this.login_fun(payload);
+            }
+          });
+          signup_btn.addEventListener("click", (event) => {
+            event.preventDefault();
+            let payload = {};
+            payload["username"] =
+              document.getElementById("signup_username").value;
+            payload["password"] =
+              document.getElementById("signup_password").value;
+            payload["role"] =
+              document.getElementById("signup_role").value;
+            payload["mobile_number"] = document.getElementById(
+              "signup_mobilenumber"
+            ).value;
+            if (payload) {
+              this.signup_fun(payload);
+            }
+          });
+        },
+        btn_switch() {
+          let login_form = document.getElementById("login_form");
+          let signup_form = document.getElementById("signup_form");
+          let show_signup = document.getElementById("show_signup");
+          let show_login = document.getElementById("show_login");
+
+          show_signup.addEventListener("click", function (event) {
+            event.preventDefault();
+            login_form.classList.add("d-none");
+            signup_form.classList.remove("d-none");
+          });
+
+          show_login.addEventListener("click", function (event) {
+            event.preventDefault();
+            signup_form.classList.add("d-none");
+            login_form.classList.remove("d-none");
+          });
+        },
+        redirect_to_url: function (url, delay = 300) {
+          if (!url) return;
+          setTimeout(() => {
+            window.location.href = url;
+          }, delay);
+        },
+        login_fun: function (payload) {
+          let that = this;
+          $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: "/api/login",
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify(payload),
+            complete: function () {},
+            success: function (data) {
+              console.log(data);
+              if (data) {
+                if (data.status) {
+                  console.log("logged In");
+                  that.redirect_to_url(
+                    that.base_url +
+                      "/dashboard" +
+                      `?username=${payload.username}`,
+                    1000
+                  );
+                } else {
+                  console.log(data.msg);
                 }
-                )
-
+              }
             },
-        };
-        $(document).ready(function () {
-            UserAuthenticate.init();
-        });
-    })
+          });
+        },
+        signup_fun: function (payload) {
+          let that = this;
+          $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: "/api/add-user",
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify(payload),
+            complete: function () {},
+            success: function (data) {
+              console.log(data);
+              if (data) {
+                if (data.status) {
+                  console.log("logged In");
+                  that.redirect_to_url(
+                    that.base_url +
+                      "/dashboard" +
+                      `?username=${payload.username}`,
+                    1000
+                  );
+                } else {
+                  console.log(data.msg);
+                }
+              }
+            },
+          });
+        },
+      };
+      $(document).ready(function () {
+        UserAuthenticate.init();
+      });
+    });
+  </script>
 
-</script>
-
-{%endblock%}
+  {%endblock%}
+</div>
