@@ -16,13 +16,18 @@ api_routes = Blueprint("api", __name__)
 
 @api_routes.route("/add-user", methods=["POST"])
 def add_user():
-    """Adding user details
-
+    """
+    Adds a new user to the database.
+    Parameters:
+        - None
     Returns:
-        object : returns operation details
+        - dict: A JSON response object containing the status and message.
+    Example:
+        add_user() -> {"msg": "Added Successfully", "status": True}
     """
     response = API_RESPONSE_OBJ.copy()
     response["msg"] = "Error Occured!"
+
     try:
         data = request.get_json() or {}
         if data:
@@ -30,85 +35,121 @@ def add_user():
             password = data.pop("password")
             user = User(**data)
             user.set_password(password)
-            if user:
-                db.session.add(user)
-                db.session.commit()
-                response["msg"] = "Added Successfully"
-                response["status"] = True
+            db.session.add(user)
+            db.session.commit()
+            response["msg"] = "Added Successfully"
+            response["status"] = True
     except Exception as ex:
         print(f"Error Occurred route_handler.add_user: {ex}")
+
     return jsonify(response)
 
 
 @api_routes.route("/login", methods=["POST"])
 def user_login():
-    """Adding user details
-
+    """
+    Handle user login and generate a response with an access token
+    if credentials are valid.
+    Parameters:
+        - None
     Returns:
-        object : returns operation details
+        - flask.Response: JSON response indicating login success or
+        failure with appropriate message.
+    user_login() -> {"status": bool, "msg": str}
+        - Example input: {"username": "testuser", "password": "password123"}
+        - Example output: {"status": True, "msg": "Logged In Successfully"}
     """
     response = API_RESPONSE_OBJ.copy()
-    response["msg"] = "Error Occured!"
+    response["msg"] = "Error Occurred!"
+
     try:
         data = request.get_json() or {}
-        username = data.get("username", None)
-        password = data.get("password", None)
-        if username and password:
-            user = User()
-            user = User.query.filter_by(username=username.lower()).first()
-            if user is None:
-                response["msg"] = "User does not exist"
-                return jsonify(response)
-            pass_check = user.check_password(password)
-            if pass_check:
-                access_token = access_token = create_access_token(
-                    identity=user.username, expires_delta=timedelta(hours=1)
-                )
-                response["status"] = True
-                response["msg"] = "Logged In Successfully"
-                resp = make_response(jsonify(response))
-                set_access_cookies(resp, access_token)
-                return resp
+        username, password = data.get("username"), data.get("password")
+
+        if not username or not password:
             response["msg"] = "Missing username or password"
-        else:
-            response["msg"] = "Invalid password"
+            return make_response(jsonify(response))
+
+        user = User.query.filter_by(username=username.lower()).first()
+
+        if not user:
+            response["msg"] = "User does not exist"
+            return make_response(jsonify(response))
+
+        if user.check_password(password):
+            access_token = create_access_token(
+                identity=user.username, expires_delta=timedelta(hours=1)
+            )
+            response["status"] = True
+            response["msg"] = "Logged In Successfully"
+            resp = make_response(jsonify(response))
+            set_access_cookies(resp, access_token)
+            return resp
+
+        response["msg"] = "Invalid password"
+
     except Exception as ex:
         print(f"Error Occurred route_handler.user_login: {ex}")
+
     return make_response(jsonify(response))
 
 
 @api_routes.route("/users", methods=["GET"])
 @jwt_required(locations=["cookies"])
 def user_data():
-    """_summary_
-
+    """
+    Fetches user data from the database and constructs a response object.
     Returns:
-        _type_: _description_
+        - dict: JSON response containing the status, message, and
+        user data, if applicable.
+    user_data() -> {
+        "status": True,
+        "msg": "Users retrieved successfully",
+        "data": {
+            "users": [
+                {"username": "sample_user", "role": "sample_role"},
+                ...
+            ]
+        }
+    }
+        - This example assumes a successful retrieval of user data.
     """
     response = API_RESPONSE_OBJ.copy()
-    response["msg"] = "Error Occured!"
+    response["msg"] = "Error Occurred!"
+
     try:
         # user_id = get_jwt_identity()
         users = User.query.all()
-        user_list = []
-        for user in users:
-            user_list.append({"username": user.username, "role": user.role})
-        response["status"] = True
-        response["msg"] = "Users retrieved successfully"
-        response["data"] = {}
-        response["data"]["users"] = user_list
+        user_list = [
+            {"username": user.username, "role": user.role} for user in users
+        ]
+
+        response.update(
+            {
+                "status": True,
+                "msg": "Users retrieved successfully",
+                "data": {"users": user_list},
+            }
+        )
     except Exception as ex:
-        print(f"Error Occured user_data: {ex}")
+        print(f"Error Occurred user_data: {ex}")
+
     return make_response(jsonify(response))
 
 
 @api_routes.route("/add-task", methods=["POST"])
 @jwt_required(locations=["cookies"])
 def add_task():
-    """_summary_
-
+    """
+    Handles the addition of a task to the system.
+    Parameters:
+        - None
     Returns:
-        _type_: _description_
+        - dict: A dictionary containing the status of the operation
+        and a message indicating success or failure.
+    Example:
+        add_task() -> {'msg': 'Task Created Successfully', 'status': True}
+            - This example shows a successful task creation response.
     """
     response = API_RESPONSE_OBJ.copy()
     response["msg"] = "Error Occured!"
@@ -116,7 +157,7 @@ def add_task():
         data = request.get_json() or {}
 
         username = get_jwt_identity()
-        created_for_username = data.get("created_for", None)
+        created_for_username = data.get("created_for")
         user = User.query.filter_by(username=username.lower()).first()
         if UserType(user.role).name == "ADMIN" and created_for_username:
             created_for = User.query.filter_by(
@@ -125,10 +166,12 @@ def add_task():
             task_data = data.get("task_data", {})
             task_data["created_user"] = user.user_id
             task_data["created_for"] = created_for.user_id
-            if (
-                task_data
-                and task_data.get("created_user", None)
-                and task_data.get("status", None)
+            if all(
+                [
+                    task_data,
+                    task_data.get("created_user"),
+                    task_data.get("status"),
+                ]
             ):
                 task = Task(**task_data)
                 if task:

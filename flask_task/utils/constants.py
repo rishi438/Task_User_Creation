@@ -10,10 +10,15 @@ API_RESPONSE_OBJ = {
 
 @unique
 class UserType(IntEnum):
-    """_summary_
-
-    Args:
-        IntEnum (_type_): _description_
+    """
+    Enumeration of different user types.
+    Parameters:
+        - None
+    Returns:
+        - UserType: Enumeration values representing different user types.
+    function(UserType.ADMIN) -> 0
+        - This example demonstrates retrieving the enumeration value for
+        an ADMIN user type, which outputs 0.
     """
 
     ADMIN = 0
@@ -23,10 +28,17 @@ class UserType(IntEnum):
 
 @unique
 class TaskType(IntEnum):
-    """_summary_
-
-    Args:
-        IntEnum (_type_): _description_
+    """
+    Enumeration for different task types.
+    This class defines three different task types using an integer enumeration.
+    Attributes:
+        - INITIATED (int): Represents the initiated state of a task.
+        - REVIEW (int): Represents the review state of a task.
+        - PUBLISHED (int): Represents the published state of a task.
+    Examples:
+        TaskType.INITIATED -> 0
+        TaskType.REVIEW -> 1
+        TaskType.PUBLISHED -> 2
     """
 
     INITIATED = 0

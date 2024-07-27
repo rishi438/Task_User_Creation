@@ -12,21 +12,29 @@ from flask_task.utils.environment import (
 
 
 def create_app():
-    """Creates Web Server Application
-
-    Returns:
-        tuple: containing instances of app and celery
     """
-
+    Create and configure the Flask application.
+    Parameters:
+        - None
+    Returns:
+        - tuple: A tuple containing the Flask app and initialized JWTManager.
+    Example:
+        - create_app() -> (Flask app, JWTManager)
+    """
     app = Flask(__name__)
 
-    app.config["TEMPLATES_AUTO_RELOAD"] = TEMPLATES_AUTO_RELOAD
-    app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URI
-    app.config["JWT_SECRET_KEY"] = JWT_SECRET_KEY
-    app.config["JWT_COOKIE_SECURE"] = False
-    app.config["JWT_COOKIE_CSRF_PROTECT"] = False
-    app.config["JWT_TOKEN_LOCATION"] = ["cookies"]
-    app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=2)
+    config = {
+        "TEMPLATES_AUTO_RELOAD": TEMPLATES_AUTO_RELOAD,
+        "SQLALCHEMY_DATABASE_URI": DATABASE_URI,
+        "JWT_SECRET_KEY": JWT_SECRET_KEY,
+        "JWT_COOKIE_SECURE": False,
+        "JWT_COOKIE_CSRF_PROTECT": False,
+        "JWT_TOKEN_LOCATION": ["cookies"],
+        "JWT_ACCESS_TOKEN_EXPIRES": timedelta(hours=2),
+    }
+
+    app.config.update(config)
+
     jwt = JWTManager(app)
     db.init_app(app)
     with app.app_context():
